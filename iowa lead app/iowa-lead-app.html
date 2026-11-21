@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Eastern Iowa Lead Exposure Triage & Health Defense</title>
+  <style>
+    :root {
+      --primary: #0f4c81;
+      --primary-light: #e8f1f8;
+      --accent: #1b7a6e;
+      --bg: #f4f7f9;
+      --card: #ffffff;
+      --text: #1e293b;
+      --muted: #64748b;
+      --border: #cbd5e1;
+      --high-bg: #fef2f2;
+      --high-border: #dc2626;
+      --high-text: #991b1b;
+      --mod-bg: #fffbeb;
+      --mod-border: #d97706;
+      --mod-text: #92400e;
+      --low-bg: #f0fdf4;
+      --low-border: #16a34a;
+      --low-text: #166534;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      padding-bottom: 3rem;
+    }
+
+    header {
+      background: var(--primary);
+      color: #fff;
+      padding: 1.5rem 1rem;
+      text-align: center;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    header h1 { font-size: 1.45rem; margin-bottom: 0.35rem; }
+    header p { font-size: 0.92rem; opacity: 0.9; max-width: 680px; margin: 0 auto; }
+
+    .container { max-width: 780px; margin: 1.5rem auto; padding: 0 1rem; }
+
+    .alert-banner {
+      background: #fff8e6;
+      border-left: 4px solid #d97706;
+      padding: 0.9rem 1rem;
+      border-radius: 6px;
+      margin-bottom: 1.25rem;
+      font-size: 0.9rem;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1.25rem;
+      flex-wrap: wrap;
+    }
+    .tab-btn {
+      flex: 1;
+      min-width: 140px;
+      padding: 0.75rem 1rem;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.92rem;
+      color: var(--text);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .tab-btn.active {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+
+    .section { display: none; }
+    .section.active { display: block; }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.25rem;
+      margin-bottom: 1.25rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+    .card h2 { font-size: 1.15rem; color: var(--primary); margin-bottom: 0.75rem; }
+    .card h3 { font-size: 1rem; margin: 1rem 0 0.4rem; }
+
+    .form-group { margin-bottom: 1rem; }
+    .form-group label { display: block; font-weight: 600; margin-bottom: 0.35rem; font-size: 0.95rem; }
+    .checkbox-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.6rem;
+      padding: 0.55rem;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      margin-bottom: 0.5rem;
+      cursor: pointer;
+      background: #fafafa;
+    }
+    .checkbox-item:hover { background: var(--primary-light); }
+    .checkbox-item input { margin-top: 0.25rem; transform: scale(1.15); }
+
+    select, input[type="text"] {
+      width: 100%;
+      padding: 0.65rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 0.95rem;
+    }
+
+    .btn {
+      display: inline-block;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      padding: 0.8rem 1.4rem;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 0.5rem;
+    }
+    .btn:hover { opacity: 0.92; }
+    .btn-outline {
+      background: #fff;
+      color: var(--primary);
+      border: 1.5px solid var(--primary);
+      margin-top: 0.75rem;
+    }
+    .btn:focus-visible, .tab-btn:focus-visible, a:focus-visible {
+      outline: 3px solid #f59e0b;
+      outline-offset: 3px;
+    }
+    .resource-link { color: var(--accent); font-weight: 600; }
+    .disclaimer { color: var(--muted); font-size: 0.88rem; margin-top: 1rem; }
+
+    /* Result Box */
+    #triageResult { display: none; margin-top: 1.25rem; }
+    .risk-badge {
+      padding: 1rem;
+      border-radius: 8px;
+      border-left: 5px solid;
+      margin-bottom: 1rem;
+    }
+    .risk-high { background: var(--high-bg); border-color: var(--high-border); color: var(--high-text); }
+    .risk-mod { background: var(--mod-bg); border-color: var(--mod-border); color: var(--mod-text); }
+    .risk-low { background: var(--low-bg); border-color: var(--low-border); color: var(--low-text); }
+
+    .action-list { padding-left: 1.25rem; margin-top: 0.5rem; }
+    .action-list li { margin-bottom: 0.5rem; font-size: 0.94rem; }
+
+    /* Nutrition Grid */
+    .nutrient-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem;
+      margin-top: 0.75rem;
+    }
+    .nutrient-box {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.9rem;
+      background: #f8fafc;
+    }
+    .nutrient-box h4 { color: var(--accent); margin-bottom: 0.35rem; font-size: 0.98rem; }
+    .nutrient-box p.mech { font-size: 0.82rem; color: var(--muted); margin-bottom: 0.6rem; }
+    .food-check { display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; margin-bottom: 0.35rem; }
+
+    /* Directory */
+    .clinic-item {
+      border-bottom: 1px solid #e2e8f0;
+      padding: 0.85rem 0;
+    }
+    .clinic-item:last-child { border-bottom: none; }
+    .clinic-item strong { display: block; font-size: 1rem; color: var(--primary); }
+    .clinic-item span { font-size: 0.88rem; color: var(--muted); display: block; }
+    .clinic-item a {
+      display: inline-block;
+      margin-top: 0.35rem;
+      color: var(--accent);
+      font-weight: 600;
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+
+    footer {
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--muted);
+      max-width: 720px;
+      margin: 2rem auto 0;
+      padding: 0 1rem;
+    }
+
+    @media print {
+      header, .tabs, .alert-banner, #triageForm, .no-print, footer { display: none !important; }
+      body { background: #fff; padding: 0; }
+      .container { margin: 0; max-width: 100%; }
+      #triageResult { display: block !important; border: none; box-shadow: none; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Eastern Iowa Lead Exposure Triage & Health Defense</h1>
+  <p>Clinical guidance, nutritional absorption defense, and local testing resources for households near the IAAAP detonation corridor.</p>
+</header>
+
+<div class="container">
+  <div class="alert-banner">
+    <strong>Detonation Window Notice:</strong> The U.S. Army controlled detonation at the Iowa Army Ammunition Plant (Middletown, IA) is scheduled for <strong>Monday, Nov. 23, 2026</strong>. Close windows, turn off fresh-air intake on HVAC systems, and review your household risk profile below.
+  </div>
+
+  <div class="tabs no-print" role="tablist" aria-label="Lead exposure resources">
+    <button id="triageTab" class="tab-btn active" role="tab" aria-selected="true" aria-controls="triage" onclick="switchTab('triage', this)">1. Clinical Risk Triage</button>
+    <button id="nutritionTab" class="tab-btn" role="tab" aria-selected="false" aria-controls="nutrition" onclick="switchTab('nutrition', this)">2. Nutrition Guidance</button>
+    <button id="directoryTab" class="tab-btn" role="tab" aria-selected="false" aria-controls="directory" onclick="switchTab('directory', this)">3. Clinics & Testing</button>
+  </div>
+
+  <!-- TAB 1: CLINICAL RISK TRIAGE -->
+  <div id="triage" class="section active" role="tabpanel" aria-labelledby="triageTab">
+    <div class="card" id="triageForm">
+      <h2>Household Vulnerability & Exposure Assessment</h2>
+      <p style="font-size:0.9rem; color:var(--muted); margin-bottom:1rem;">
+        Select any factors that apply to your household. This checklist is educational and does not estimate an individual’s blood lead level.
+      </p>
+
+      <div class="form-group">
+        <label for="cityInput">Your City / County (e.g., Hiawatha, Cedar Rapids, Burlington):</label>
+        <input type="text" id="cityInput" placeholder="Enter your town or county..." />
+      </div>
+
+      <div class="form-group">
+        <label>1. Biological Vulnerability (Check all that apply in your household):</label>
+        <label class="checkbox-item">
+          <input type="checkbox" id="vChild" />
+          <span><strong>Children under age 6</strong> (developing nervous systems absorb up to 4–5x more lead than adults)</span>
+        </label>
+        <label class="checkbox-item">
+          <input type="checkbox" id="vPregnant" />
+          <span><strong>Pregnant or breastfeeding individual</strong> (lead can cross the placenta and enter breast milk)</span>
+        </label>
+        <label class="checkbox-item">
+          <input type="checkbox" id="vResp" />
+          <span><strong>Asthma, COPD, or chronic respiratory condition</strong> (higher sensitivity to fine particulate dust PM<sub>2.5</sub>)</span>
+        </label>
+      </div>
+
+      <div class="form-group">
+        <label>2. Environmental & Water Exposure Factors:</label>
+        <label class="checkbox-item">
+          <input type="checkbox" id="eWell" />
+          <span><strong>Private well water or cistern</strong> (not on tested municipal water supply)</span>
+        </label>
+        <label class="checkbox-item">
+          <input type="checkbox" id="eOutdoor" />
+          <span><strong>High outdoor dust exposure</strong> (downwind of plume, outdoor workers, or children playing in bare soil)</span>
+        </label>
+        <label class="checkbox-item">
+          <input type="checkbox" id="eOldHome" />
+          <span><strong>Home built before 1978</strong> (potential cumulative exposure alongside legacy lead paint/pipes)</span>
+        </label>
+      </div>
+
+      <button class="btn" type="button" onclick="calculateTriage()">Generate Clinical Action Plan</button>
+    </div>
+
+    <!-- GENERATED DOCTOR SUMMARY -->
+    <div class="card" id="triageResult" role="status" aria-live="polite" tabindex="-1">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem; margin-bottom:0.75rem;">
+        <h2 style="margin:0;">Household Lead Triage & Clinician Summary</h2>
+        <span id="summaryDate" style="font-size:0.85rem; color:var(--muted);"></span>
+      </div>
+      <p id="summaryLocation" style="font-size:0.9rem; font-weight:600; margin-bottom:0.75rem;"></p>
+
+      <div id="riskBanner" class="risk-badge"></div>
+      <h3>Suggested next steps</h3>
+      <ul class="action-list" id="actionList"></ul>
+      <h3>Factors selected</h3>
+      <p id="selectedFactors"></p>
+      <p class="disclaimer">
+        This educational tool cannot diagnose lead exposure or replace medical advice. A blood lead test, interpreted by a healthcare professional, is used to measure a person’s blood lead level.
+      </p>
+      <button class="btn btn-outline no-print" type="button" onclick="window.print()">Print clinician summary</button>
+    </div>
+  </div>
+
+  <section id="nutrition" class="section" role="tabpanel" aria-labelledby="nutritionTab" hidden>
+    <div class="card">
+      <h2>Nutrition can support health, but it cannot remove lead</h2>
+      <p>Regular meals with varied, nutritious foods are helpful for general health. Food or supplements do not prevent, diagnose, or treat lead exposure; discuss supplements with a healthcare professional.</p>
+      <div class="nutrient-grid">
+        <div class="nutrient-box">
+          <h4>Calcium-containing foods</h4>
+          <p>Examples include milk, yogurt, cheese, calcium-set tofu, and some leafy greens.</p>
+        </div>
+        <div class="nutrient-box">
+          <h4>Iron-containing foods</h4>
+          <p>Examples include beans, lentils, fortified cereals, eggs, and lean meats.</p>
+        </div>
+        <div class="nutrient-box">
+          <h4>Vitamin C-containing foods</h4>
+          <p>Examples include oranges, berries, tomatoes, bell peppers, and broccoli.</p>
+        </div>
+      </div>
+      <p class="disclaimer">Do not delay testing or medical care in favor of dietary changes. Ask a clinician or registered dietitian about individual nutrition needs.</p>
+    </div>
+  </section>
+
+  <section id="directory" class="section" role="tabpanel" aria-labelledby="directoryTab" hidden>
+    <div class="card">
+      <h2>Where to ask about testing</h2>
+      <div class="clinic-item">
+        <strong>Your healthcare provider</strong>
+        <span>Ask whether a blood lead test is appropriate, especially for young children or anyone with a possible exposure.</span>
+      </div>
+      <div class="clinic-item">
+        <strong>Your local county public health department</strong>
+        <span>Ask about local lead testing, home assessment, and environmental health services in your area.</span>
+      </div>
+      <div class="clinic-item">
+        <strong>Private well water testing</strong>
+        <span>Contact your local health department or an accredited drinking-water laboratory to ask how to collect a sample and test for lead.</span>
+      </div>
+      <h3>Trusted information</h3>
+      <p><a class="resource-link" href="https://www.cdc.gov/lead-prevention/" target="_blank" rel="noopener noreferrer">CDC: Lead prevention</a></p>
+      <p><a class="resource-link" href="https://www.epa.gov/lead" target="_blank" rel="noopener noreferrer">U.S. EPA: Lead information</a></p>
+      <p><a class="resource-link" href="https://hhs.iowa.gov/" target="_blank" rel="noopener noreferrer">Iowa Health and Human Services</a></p>
+    </div>
+  </section>
+</div>
+
+<footer>
+  For educational use only. Follow current guidance from your healthcare provider and local public-health officials.
+</footer>
+
+<script>
+  const factorLabels = {
+    vChild: "Children under age 6",
+    vPregnant: "Pregnant or breastfeeding individual",
+    vResp: "Asthma, COPD, or chronic respiratory condition",
+    eWell: "Private well water or cistern",
+    eOutdoor: "Outdoor dust exposure",
+    eOldHome: "Home built before 1978"
+  };
+
+  function switchTab(tabId, button) {
+    const sections = document.querySelectorAll(".section");
+    const tabs = document.querySelectorAll('[role="tab"]');
+    const target = document.getElementById(tabId);
+    if (!target || button.getAttribute("aria-controls") !== tabId) return;
+    sections.forEach(section => {
+      const active = section.id === tabId;
+      section.classList.toggle("active", active);
+      section.hidden = !active;
+    });
+    tabs.forEach(tab => {
+      const active = tab === button;
+      tab.classList.toggle("active", active);
+      tab.setAttribute("aria-selected", String(active));
+      tab.tabIndex = active ? 0 : -1;
+    });
+    button.focus();
+  }
+
+  function addAction(list, text) {
+    const item = document.createElement("li");
+    item.textContent = text;
+    list.appendChild(item);
+  }
+
+  function calculateTriage() {
+    const selected = Object.keys(factorLabels).filter(id => document.getElementById(id).checked);
+    const city = document.getElementById("cityInput").value.trim();
+    const list = document.getElementById("actionList");
+    const banner = document.getElementById("riskBanner");
+
+    list.replaceChildren();
+    if (selected.length === 0) {
+      addAction(list, "If you are concerned about a possible exposure, contact a healthcare provider or your local public-health department to discuss whether testing is appropriate.");
+    }
+    if (selected.includes("vChild") || selected.includes("vPregnant")) {
+      addAction(list, "Contact a healthcare provider to discuss possible exposure and whether a blood lead test is appropriate. A blood test—not this checklist—measures blood lead level.");
+    }
+    if (selected.includes("vResp")) {
+      addAction(list, "Follow the person’s existing respiratory care plan and current local air-quality or public-health guidance. This checklist cannot assess airborne exposure.");
+    }
+    if (selected.includes("eWell")) {
+      addAction(list, "Ask your local health department or an accredited drinking-water laboratory how to test the well or cistern for lead.");
+    }
+    if (selected.includes("eOutdoor")) {
+      addAction(list, "Reduce dust brought indoors: remove shoes at the entrance, wash hands after outdoor activity, and damp-clean dusty surfaces rather than dry sweeping.");
+    }
+    if (selected.includes("eOldHome")) {
+      addAction(list, "If paint may be disturbed, avoid sanding or scraping it yourself. Ask a qualified lead-safe professional or local health department about safe assessment and renovation.");
+    }
+    addAction(list, "Share possible exposure details with a healthcare professional. Do not use this tool as a diagnosis or as a substitute for testing.");
+
+    banner.className = "risk-badge risk-mod";
+    banner.textContent = selected.length
+      ? "Action plan generated from the factors selected. This is not a clinical risk score or diagnosis."
+      : "No checklist factors selected. A blank checklist does not rule out lead exposure.";
+
+    document.getElementById("summaryDate").textContent =
+      new Intl.DateTimeFormat(undefined, { dateStyle: "long" }).format(new Date());
+    document.getElementById("summaryLocation").textContent =
+      city ? `Location provided: ${city}` : "No city or county provided.";
+    document.getElementById("selectedFactors").textContent = selected.length
+      ? selected.map(id => factorLabels[id]).join("; ")
+      : "None selected.";
+
+    const result = document.getElementById("triageResult");
+    result.style.display = "block";
+    result.focus();
+  }
+
+  document.querySelectorAll(".tabs [role='tab']").forEach(tab => {
+    tab.addEventListener("keydown", event => {
+      if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
+      event.preventDefault();
+      const tabs = [...document.querySelectorAll(".tabs [role='tab']")];
+      const current = tabs.indexOf(event.currentTarget);
+      const next = event.key === "Home" ? 0
+        : event.key === "End" ? tabs.length - 1
+        : (current + (event.key === "ArrowRight" ? 1 : -1) + tabs.length) % tabs.length;
+      tabs[next].click();
+    });
+  });
+</script>
+
+</body>
+</html>
